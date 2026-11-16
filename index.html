@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>4everChats - Real Chat</title>
+<title>4everChats - Real Social</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -13,52 +13,78 @@
 .msg{max-width:75%;padding:8px 12px;border-radius:18px;font-size:15px;line-height:1.4;word-wrap:break-word}
 .me{background:#00a884;color:#fff;border-bottom-right-radius:4px;margin-left:auto}
 .them{background:#fff;border-bottom-left-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.tab-active{background:#000;color:#fff}
+.logo{background:linear-gradient(135deg,#a3e635,#2dd4bf,#38bdf8,#a78bfa)}
 </style>
 </head>
 <body>
 <div id="landing" class="aurora flex flex-col p-5 pb-8">
-  <div class="flex justify-between items-center"><div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 via-blue-400 to-purple-500 flex items-center justify-center text-2xl">💬</div><span class="bg-black/10 rounded-full px-3 py-2 text-sm font-bold">English</span></div>
+  <div class="flex justify-between items-center"><div class="w-12 h-12 rounded-2xl logo flex items-center justify-center text-white text-3xl font-black shadow-lg">∞</div><span class="bg-black/10 rounded-full px-3 py-2 text-sm font-bold">English</span></div>
   <h1 class="text-[52px] leading-[0.95] font-black mt-8">Chat<br>Forever.<br><span class="text-white">With Anyone.</span><br>Anywhere.</h1>
-  <p class="font-semibold mt-3">Built in Jamaica - for the whole world. • REAL CHAT</p>
+  <p class="font-semibold mt-3">Built in Jamaica - for the whole world. • REAL SOCIAL</p>
   <div class="mt-auto flex flex-col gap-3 pt-10">
     <button onclick="openAuth('start')" class="w-full bg-black text-white font-bold py-4 rounded-full text-[17px]">Start Chatting</button>
     <button onclick="openAuth('login')" class="w-full bg-white/60 font-bold py-4 rounded-full text-[15px] text-blue-600">Login</button>
-    <p class="text-center text-xs opacity-70 font-medium">Real messages • No phone number needed</p>
+    <p class="text-center text-xs opacity-70 font-medium">Real posts • Real chats • No phone number needed</p>
   </div>
 </div>
 
 <div id="auth" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
   <div class="bg-white w-full sm:max-w-sm rounded-t-[28px] sm:rounded-[28px] p-6 pb-8">
-    <div class="flex justify-between"><h2 id="authTitle" class="text-2xl font-black">Start Chatting</h2><button onclick="closeAuth()" class="text-2xl">✕</button></div>
+    <div class="flex justify-between"><h2 class="text-2xl font-black">Start Chatting</h2><button onclick="closeAuth()" class="text-2xl">✕</button></div>
     <p class="text-gray-500 text-sm mt-1">Pick a username - everyone will see it.</p>
     <label class="block text-xs font-bold text-gray-500 mt-6">USERNAME</label>
     <input id="usernameInput" placeholder="e.g. CodeE" class="w-full border-2 border-gray-200 rounded-2xl px-4 py-3.5 mt-1 text-[16px] outline-none focus:border-green-500">
     <button onclick="enterApp()" class="w-full bg-black text-white font-bold py-4 rounded-full mt-6">Continue →</button>
-    <p id="authError" class="text-red-500 text-sm mt-2 hidden"></p>
   </div>
 </div>
 
-<div id="app" class="hidden bg-[#f0f2f5] min-h-[100dvh] flex flex-col">
+<div id="app" class="hidden bg-[#f0f2f5] min-h-[100dvh] flex flex-col pb-20">
   <div class="bg-[#075e54] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-    <div><div class="font-bold text-[19px]">4everChats</div><div id="myNameLabel" class="text-[12px] opacity-80">@you • Online • REAL</div></div>
+    <div class="flex items-center gap-2"><div class="w-9 h-9 rounded-xl logo flex items-center justify-center text-white text-xl font-black">∞</div><div><div class="font-bold text-[19px] leading-none">4everChats ∞</div><div id="myNameLabel" class="text-[12px] opacity-80">@you • Online</div></div></div>
     <button onclick="logout()" class="bg-white/20 px-3 py-1.5 rounded-full text-xs font-bold">Log out</button>
   </div>
-  <div class="flex flex-1 overflow-hidden">
-    <div id="contactsPane" class="w-full sm:w-[340px] bg-white border-r flex flex-col">
-      <div class="p-3"><div class="bg-green-100 text-green-800 text-xs font-bold rounded-full px-3 py-2 text-center">● LIVE - messages are real now</div></div>
-      <div id="contactsList" class="flex-1 overflow-y-auto"></div>
+
+  <!-- TABS -->
+  <div class="flex gap-2 p-3 bg-white sticky top-[58px] z-10">
+    <button id="tabFeed" onclick="showTab('feed')" class="flex-1 py-2.5 rounded-full font-bold text-sm tab-active">🏠 Feed</button>
+    <button id="tabChats" onclick="showTab('chats')" class="flex-1 py-2.5 rounded-full font-bold text-sm bg-gray-100">💬 Chats</button>
+    <button id="tabProfile" onclick="showTab('profile')" class="flex-1 py-2.5 rounded-full font-bold text-sm bg-gray-100">👤 Me</button>
+  </div>
+
+  <!-- FEED -->
+  <div id="feedPane" class="flex flex-col gap-3 p-3">
+    <div class="bg-white rounded-2xl p-3 shadow-sm">
+      <textarea id="postInput" placeholder="What's happening? 🇯🇲" class="w-full outline-none resize-none text-[15px] min-h-[60px]"></textarea>
+      <button onclick="sendPost()" class="w-full bg-black text-white font-bold py-3 rounded-full mt-2">Post to the World →</button>
     </div>
-    <div id="chatPane" class="hidden sm:flex flex-1 flex-col bg-[#efeae2]">
+    <div id="postsList" class="flex flex-col gap-3"><div class="text-center text-gray-500 text-sm">Loading real posts...</div></div>
+  </div>
+
+  <!-- CHATS -->
+  <div id="chatsPane" class="hidden flex-col">
+    <div id="contactsList" class="flex flex-col bg-white"></div>
+    <div id="chatPane" class="hidden flex-col bg-[#efeae2] min-h-[60vh]">
       <div class="bg-white px-4 py-3 flex items-center gap-3 shadow-sm">
-        <button onclick="showContacts()" class="sm:hidden text-xl">←</button>
+        <button onclick="showContacts()" class="text-xl">←</button>
         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold" id="chatAvatar">J</div>
-        <div class="flex-1"><div id="chatName" class="font-bold">Jamaica Group</div><div class="text-xs text-green-600">Live • Everyone in this room sees this</div></div>
+        <div class="flex-1"><div id="chatName" class="font-bold">Jamaica Group</div><div class="text-xs text-green-600">Live • Real messages</div></div>
       </div>
-      <div id="messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2"></div>
-      <div class="bg-white p-2 flex gap-2 items-center">
+      <div id="messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 min-h-[300px]"></div>
+      <div class="bg-white p-2 flex gap-2 items-center sticky bottom-0">
         <input id="msgInput" placeholder="Message" class="flex-1 bg-[#f0f2f5] rounded-full px-4 py-3 outline-none text-[15px]" onkeydown="if(event.key==='Enter') sendMsg()">
         <button onclick="sendMsg()" class="w-11 h-11 rounded-full bg-[#00a884] text-white text-xl flex items-center justify-center">➤</button>
       </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="profilePane" class="hidden p-4">
+    <div class="bg-white rounded-3xl p-6 text-center shadow-sm">
+      <div class="w-20 h-20 rounded-full logo mx-auto flex items-center justify-center text-white text-4xl font-black" id="profileAvatar">C</div>
+      <h2 id="profileName" class="text-2xl font-black mt-3">@CodeE</h2>
+      <p class="text-gray-500 text-sm">Member of 4everChats • Jamaica 🇯🇲</p>
+      <div class="flex gap-3 mt-4"><div class="flex-1 bg-gray-100 rounded-2xl py-3"><div id="myPostsCount" class="font-black text-lg">0</div><div class="text-xs text-gray-500">Posts</div></div><div class="flex-1 bg-gray-100 rounded-2xl py-3"><div class="font-black text-lg">∞</div><div class="text-xs text-gray-500">Forever</div></div></div>
     </div>
   </div>
 </div>
@@ -67,73 +93,85 @@
 const SUPABASE_URL = "https://wotvfxqlcmfvjfpvwrik.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_CVKqhCdG90vTEV6O2kKN6g_lEoCSJe3";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 let me = localStorage.getItem('4ever_user') || '';
 let current = 'Jamaica Group';
-let contacts = [
-  {name:'Jamaica Group', avatar:'J', color:'from-green-400 to-blue-500'},
-  {name:'Kingston Vibes', avatar:'K', color:'from-yellow-400 to-orange-500'},
-  {name:'World Chat', avatar:'W', color:'from-purple-400 to-pink-500'},
-  {name:'4ever Support', avatar:'4', color:'from-blue-400 to-cyan-500'}
-];
-let channel = null;
-
-function openAuth(m){ document.getElementById('auth').classList.remove('hidden'); document.getElementById('authTitle').textContent = m==='login' ? 'Welcome Back' : 'Start Chatting'; }
-function closeAuth(){ document.getElementById('auth').classList.add('hidden'); }
+let contacts = [{name:'Jamaica Group',avatar:'J'},{name:'Kingston Vibes',avatar:'K'},{name:'World Chat',avatar:'W'},{name:'4ever Support',avatar:'4'}];
+let channel=null, postChannel=null;
+function openAuth(m){document.getElementById('auth').classList.remove('hidden')}
+function closeAuth(){document.getElementById('auth').classList.add('hidden')}
 function enterApp(){
-  let u = document.getElementById('usernameInput').value.trim();
-  if(!u){ document.getElementById('authError').textContent='Please enter a username'; document.getElementById('authError').classList.remove('hidden'); return; }
+  let u=document.getElementById('usernameInput').value.trim(); if(!u) return alert('Enter a username');
   me=u; localStorage.setItem('4ever_user',u);
-  document.getElementById('landing').classList.add('hidden');
-  document.getElementById('auth').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('myNameLabel').textContent='@'+u+' • Online • REAL';
-  renderContacts(); openChat(current);
+  document.getElementById('landing').classList.add('hidden'); document.getElementById('auth').classList.add('hidden'); document.getElementById('app').classList.remove('hidden');
+  init();
 }
-function logout(){ localStorage.removeItem('4ever_user'); location.reload(); }
+function logout(){localStorage.removeItem('4ever_user'); location.reload()}
+function init(){
+  document.getElementById('myNameLabel').textContent='@'+me+' • Online';
+  document.getElementById('profileName').textContent='@'+me;
+  document.getElementById('profileAvatar').textContent=me[0].toUpperCase();
+  renderContacts(); loadPosts(); openChat(current); subscribePosts();
+}
+function showTab(t){
+  ['feed','chats','profile'].forEach(x=>{
+    document.getElementById(x+'Pane').classList.add('hidden'); document.getElementById(x+'Pane').classList.remove('flex');
+    document.getElementById('tab'+x[0].toUpperCase()+x.slice(1)).classList.remove('tab-active'); document.getElementById('tab'+x[0].toUpperCase()+x.slice(1)).classList.add('bg-gray-100');
+  });
+  document.getElementById(t+'Pane').classList.remove('hidden'); document.getElementById(t+'Pane').classList.add('flex');
+  document.getElementById('tab'+t[0].toUpperCase()+t.slice(1)).classList.add('tab-active'); document.getElementById('tab'+t[0].toUpperCase()+t.slice(1)).classList.remove('bg-gray-100');
+  if(t==='chats') document.getElementById('contactsList').classList.remove('hidden');
+}
 function renderContacts(){
-  document.getElementById('contactsList').innerHTML = contacts.map(c=>`<div onclick="openChat('${c.name}')" class="flex items-center gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer active:bg-gray-50"><div class="w-12 h-12 rounded-full bg-gradient-to-br ${c.color} flex items-center justify-center text-white font-bold text-lg">${c.avatar}</div><div class="flex-1"><div class="font-semibold">${c.name}</div><div class="text-[13px] text-gray-500">Tap to open live chat</div></div><div class="w-2 h-2 bg-green-500 rounded-full"></div></div>`).join('');
+  document.getElementById('contactsList').innerHTML = contacts.map(c=>`<div onclick="openChat('${c.name}')" class="flex items-center gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-lg">${c.avatar}</div><div class="flex-1"><div class="font-semibold">${c.name}</div><div class="text-[13px] text-gray-500">Tap to open live chat</div></div><div class="w-2 h-2 bg-green-500 rounded-full"></div></div>`).join('');
 }
 async function openChat(name){
-  current=name; let c=contacts.find(x=>x.name===name);
-  document.getElementById('chatName').textContent=name;
-  document.getElementById('chatAvatar').textContent=c.avatar;
-  if(window.innerWidth<640){ document.getElementById('contactsPane').classList.add('hidden'); document.getElementById('chatPane').classList.remove('hidden'); document.getElementById('chatPane').classList.add('flex'); }
+  current=name; document.getElementById('chatName').textContent=name; document.getElementById('chatAvatar').textContent=name[0];
+  document.getElementById('chatPane').classList.remove('hidden'); document.getElementById('chatPane').classList.add('flex');
   await loadMessages();
   if(channel) supabase.removeChannel(channel);
-  channel = supabase.channel('room-'+name).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`room=eq.${name}`},payload=>{ addMessageToUI(payload.new); }).subscribe();
+  channel = supabase.channel('room-'+name).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`room=eq.${name}`},p=>addMessageToUI(p.new)).subscribe();
 }
-function showContacts(){ document.getElementById('contactsPane').classList.remove('hidden'); document.getElementById('chatPane').classList.add('hidden'); }
+function showContacts(){document.getElementById('chatPane').classList.add('hidden')}
 async function loadMessages(){
-  let box=document.getElementById('messages'); box.innerHTML='<div class="text-center text-gray-500 text-sm mt-4">Loading live messages...</div>';
+  let box=document.getElementById('messages'); box.innerHTML='Loading...';
   let {data,error}=await supabase.from('messages').select('*').eq('room',current).order('created_at',{ascending:true}).limit(100);
-  if(error){ box.innerHTML='<div class="bg-red-100 p-3 rounded-xl text-sm">Error: '+error.message+'<br>Did you run the SQL? Is your anon key pasted?</div>'; return; }
-  box.innerHTML='';
+  if(error){box.innerHTML='Error: '+error.message; return} box.innerHTML='';
   if(!data.length) box.innerHTML='<div class="text-center text-gray-500 text-sm mt-4">No messages yet. Be the first! 🇯🇲</div>';
   data.forEach(addMessageToUI);
 }
 function addMessageToUI(m){
-  let box=document.getElementById('messages');
-  if(box.textContent.includes('No messages yet')||box.textContent.includes('Loading')) box.innerHTML='';
-  let isMe = m.username===me;
-  let div=document.createElement('div');
-  div.className='msg '+(isMe?'me':'them');
-  div.innerHTML = (!isMe?`<div class="text-[11px] font-bold text-green-700 mb-0.5">${escapeHtml(m.username||'Someone')}</div>`:'') + escapeHtml(m.text) + `<div class="text-[10px] opacity-60 text-right mt-1">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>`;
+  let box=document.getElementById('messages'); if(box.textContent.includes('No messages')||box.textContent.includes('Loading')) box.innerHTML='';
+  let isMe=m.username===me; let div=document.createElement('div'); div.className='msg '+(isMe?'me':'them');
+  div.innerHTML=(!isMe?`<div class="text-[11px] font-bold text-green-700">${escapeHtml(m.username)}</div>`:'')+escapeHtml(m.text);
   box.appendChild(div); box.scrollTop=box.scrollHeight;
 }
-function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 async function sendMsg(){
-  let inp=document.getElementById('msgInput'); let t=inp.value.trim(); if(!t) return;
-  inp.value='';
-  let {error}=await supabase.from('messages').insert({username:me, room:current, text:t});
-  if(error) alert('Send failed: '+error.message);
+  let inp=document.getElementById('msgInput'); let t=inp.value.trim(); if(!t) return; inp.value='';
+  let {error}=await supabase.from('messages').insert({username:me,room:current,text:t}); if(error) alert(error.message);
 }
-if(me){
-  document.getElementById('landing').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('myNameLabel').textContent='@'+me+' • Online • REAL';
-  renderContacts(); openChat(current);
-} else { renderContacts(); }
+async function loadPosts(){
+  let {data}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
+  let list=document.getElementById('postsList'); list.innerHTML='';
+  if(!data||!data.length) list.innerHTML='<div class="bg-white rounded-2xl p-4 text-center text-gray-500 text-sm">No posts yet. Be the first to post! 🚀</div>';
+  else data.forEach(addPostToUI);
+  document.getElementById('myPostsCount').textContent = data? data.filter(p=>p.username===me).length : 0;
+}
+function addPostToUI(p){
+  let list=document.getElementById('postsList'); if(list.textContent.includes('No posts yet')) list.innerHTML='';
+  let div=document.createElement('div'); div.className='bg-white rounded-2xl p-4 shadow-sm';
+  div.innerHTML=`<div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full logo flex items-center justify-center text-white font-bold">${escapeHtml((p.username||'?')[0].toUpperCase())}</div><div><div class="font-bold text-sm">@${escapeHtml(p.username)}</div><div class="text-xs text-gray-400">${new Date(p.created_at).toLocaleString()}</div></div></div><div class="mt-2 text-[15px]">${escapeHtml(p.text)}</div>`;
+  list.prepend(div);
+}
+function subscribePosts(){
+  if(postChannel) supabase.removeChannel(postChannel);
+  postChannel=supabase.channel('posts-feed').on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},p=>addPostToUI(p.new)).subscribe();
+}
+async function sendPost(){
+  let inp=document.getElementById('postInput'); let t=inp.value.trim(); if(!t) return; inp.value='';
+  let {error}=await supabase.from('posts').insert({username:me,text:t}); if(error) alert(error.message); else loadPosts();
+}
+if(me){document.getElementById('landing').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); init()} else {renderContacts()}
 </script>
 </body>
 </html>
