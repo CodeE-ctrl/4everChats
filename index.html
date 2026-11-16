@@ -2,118 +2,165 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>4everChats</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial;background:#0a0a0a;color:#fff}
-.aurora{background:linear-gradient(135deg,#A3E635,#22D3EE,#8B5CF6)}
-.aurora-text{background:linear-gradient(90deg,#A3E635,#22D3EE,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-button{cursor:pointer;border:0} input,select{font-size:16px;outline:none}
-/* NEW OFFICIAL LOGO - Infinity + Chat Bubble */
-.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#84CC16 0%,#22D3EE 45%,#8B5CF6 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 24px rgba(34,211,238,.35),0 0 20px rgba(163,230,53,.25)}
-.logo svg{width:36px;height:36px}
-.logo-sm{width:36px;height:36px;border-radius:11px}.logo-sm svg{width:26px;height:26px}
-.logo-big{width:110px;height:110px;border-radius:30px;box-shadow:0 0 60px rgba(34,211,238,.55),0 0 80px rgba(139,92,246,.4)}.logo-big svg{width:82px;height:82px}
-#splash{position:fixed;inset:0;background:#000;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:splashHide .5s ease 2s forwards}
-@keyframes splashHide{to{opacity:0;visibility:hidden}}
-#topbar{position:sticky;top:0;z-index:40;background:#0a0a0a;border-bottom:1px solid #222;padding:10px 12px}
-.pill{background:#1f1f23;color:#fff;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700}
-.pill.active{background:#fff;color:#000}
-.home{min-height:100vh;background:linear-gradient(135deg,#A3E635,#22D3EE,#8B5CF6);color:#000;padding:20px;display:flex;flex-direction:column}
-.btn-black{background:#000;color:#fff;padding:16px;border-radius:999px;font-weight:800;font-size:16px;width:100%}
-.btn-white{background:rgba(255,255,255,.5);padding:14px;border-radius:999px;font-weight:700;width:100%;margin-top:10px}
-.card{background:#111;border:1px solid #222;padding:14px;border-radius:20px;margin:14px auto;max-width:400px;width:100%}
-.field{width:100%;padding:14px;border-radius:12px;background:#1f1f23;border:0;color:#fff;margin-top:6px}
-.btn-aurora{width:100%;padding:14px;border-radius:12px;font-weight:900;background:linear-gradient(135deg,#A3E635,#22D3EE,#8B5CF6);color:#000;margin-top:14px}
-.btn-grey{width:100%;padding:14px;border-radius:12px;background:#1f1f23;color:#fff;margin-top:8px}
-.bubble-me{background:linear-gradient(135deg,#A3E635,#22D3EE);color:#000;padding:10px 14px;border-radius:18px 18px 4px 18px;max-width:82%}
-.bubble-other{background:#1f1f23;padding:10px 14px;border-radius:18px 18px 18px 4px;max-width:82%;border:1px solid #2a2a2e}
-#messages{padding:12px;padding-bottom:180px;display:flex;flex-direction:column;gap:10px;min-height:300px}
-#inputBar{position:fixed;left:0;right:0;bottom:66px;background:#0a0a0a;border-top:1px solid #222;padding:10px;display:flex;gap:8px;z-index:50}
-#bottomNav{position:fixed;left:0;right:0;bottom:0;background:#0a0a0a;border-top:1px solid #222;display:flex;justify-content:space-around;padding:10px 0 14px;z-index:60}
-.nav{color:#888;font-size:11px;font-weight:700;text-align:center;background:none}
-.nav.active{color:#A3E635}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.aurora{background:linear-gradient(135deg,#a3e635 0%,#4ade80 25%,#2dd4bf 50%,#38bdf8 75%,#a78bfa 100%);min-height:100dvh}
 .hidden{display:none!important}
-.toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:200;max-width:90%;text-align:center}
+.chat-bg{background:#f0f2f5}
+.msg{max-width:75%;padding:8px 12px;border-radius:18px;font-size:15px;line-height:1.4;word-wrap:break-word}
+.me{background:#00a884;color:#fff;border-bottom-right-radius:4px;margin-left:auto}
+.them{background:#fff;border-bottom-left-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.08)}
 </style>
 </head>
 <body>
-<div id="splash" onclick="this.remove()">
-  <div class="logo logo-big"><svg viewBox="0 0 100 80" fill="none"><path d="M50 12 C30 12 12 20 12 38 C12 56 30 64 50 64 L62 64 C66 72 72 76 80 74 C74 68 74 62 76 56 C90 50 92 28 78 18 C66 8 52 12 42 26 C32 40 22 52 14 46 C8 42 10 30 20 24 C30 18 40 26 50 38 C60 50 70 58 80 52 C88 47 88 36 80 30 C70 22 58 28 50 38" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M28 44 C36 36 44 30 50 38" stroke="white" stroke-width="7" stroke-linecap="round"/></svg></div>
-  <h1 style="font-size:28px;margin:16px 0 4px">4everChats <span class="aurora-text">Forever</span></h1>
-  <p style="color:#888;font-size:13px;margin:0">Chat Forever. With Anyone. Anywhere.</p>
-</div>
-<div id="toast" class="toast hidden"></div>
-<div id="topbar" class="hidden">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <div style="display:flex;gap:8px;align-items:center"><div class="logo logo-sm"><svg viewBox="0 0 100 80" fill="none"><path d="M50 12 C30 12 12 20 12 38 C12 56 30 64 50 64 L62 64 C66 72 72 76 80 74 C74 68 74 62 76 56 C90 50 92 28 78 18 C66 8 52 12 42 26 C32 40 22 52 14 46 C8 42 10 30 20 24 C30 18 40 26 50 38 C60 50 70 58 80 52 C88 47 88 36 80 30 C70 22 58 28 50 38" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><b>4everChats</b><div id="onlineText" style="font-size:11px;color:#888">Connecting...</div></div></div>
-    <div style="display:flex;gap:6px"><select onchange="setLang(this.value)" style="background:#1f1f23;color:#fff;border:0;padding:8px;border-radius:999px;font-size:12px"><option value="en">English</option><option value="es">Espanol</option><option value="fr">Francais</option><option value="pt">Portugues</option><option value="ht">Kreyol</option><option value="de">Deutsch</option><option value="ja">Japanese</option><option value="hi">Hindi</option><option value="ar">Arabic</option></select><button onclick="logout()" style="background:#1f1f23;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px">Logout</button></div>
+
+<!-- LANDING -->
+<div id="landing" class="aurora flex flex-col p-5 pb-8">
+  <div class="flex justify-between items-center">
+    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 via-blue-400 to-purple-500 flex items-center justify-center text-2xl shadow-lg">💬</div>
+    <select class="bg-black/10 rounded-full px-3 py-2 text-sm font-bold"><option>English</option><option>Español</option><option>Français</option></select>
   </div>
-  <div style="display:flex;gap:6px;margin-top:10px;overflow-x:auto"><button id="chip-world" onclick="showTab('world')" class="pill active">World</button><button id="chip-groups" onclick="showTab('groups')" class="pill">Groups</button><button id="chip-dms" onclick="showTab('dms')" class="pill">DMs</button></div>
+  <h1 class="text-[52px] leading-[0.95] font-black tracking-tight mt-8">Chat<br>Forever.<br><span class="text-white">With Anyone.</span><br>Anywhere.</h1>
+  <p class="font-semibold mt-3">Built in Jamaica - for the whole world.</p>
+  <div class="mt-auto flex flex-col gap-3 pt-10">
+    <button onclick="openAuth('start')" class="w-full bg-black text-white font-bold py-4 rounded-full text-[17px] active:scale-[0.98]">Start Chatting</button>
+    <button onclick="openAuth('login')" class="w-full bg-white/60 backdrop-blur font-bold py-4 rounded-full text-[15px] text-blue-600 active:scale-[0.98]">Login</button>
+    <p class="text-center text-xs opacity-70 font-medium">No phone number needed • Free forever</p>
+  </div>
 </div>
-<div id="pageHome"><div class="home">
-  <div style="display:flex;justify-content:space-between;align-items:center"><div class="logo"><svg viewBox="0 0 100 80" fill="none"><path d="M50 12 C30 12 12 20 12 38 C12 56 30 64 50 64 L62 64 C66 72 72 76 80 74 C74 68 74 62 76 56 C90 50 92 28 78 18 C66 8 52 12 42 26 C32 40 22 52 14 46 C8 42 10 30 20 24 C30 18 40 26 50 38 C60 50 70 58 80 52 C88 47 88 36 80 30 C70 22 58 28 50 38" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><select onchange="setLang(this.value)" style="background:rgba(0,0,0,.2);border:0;padding:8px 12px;border-radius:999px;font-weight:700"><option value="en">English</option><option value="es">Espanol</option><option value="fr">Francais</option><option value="pt">Portugues</option><option value="ht">Kreyol</option><option value="de">Deutsch</option><option value="ja">Japanese</option><option value="hi">Hindi</option><option value="ar">Arabic</option></select></div>
-  <h1 style="font-size:54px;line-height:.95;margin:28px 0 8px;font-weight:900;letter-spacing:-1px"><span data-i18n="title1">Chat</span><br><span data-i18n="title2">Forever.</span><br><span style="color:#fff" data-i18n="title3">With Anyone.</span><br><span data-i18n="title4">Anywhere.</span></h1>
-  <p data-i18n="subtitle" style="font-weight:500;margin:0">Built in Jamaica - for the whole world.</p>
-  <button onclick="goAuth()" class="btn-black" style="margin-top:22px"><span data-i18n="start">Start Chatting</span></button>
-  <button onclick="goAuth()" class="btn-white"><span data-i18n="loginBtn">Login</span></button>
-</div></div>
-<div id="pageAuth" class="hidden" style="padding:20px">
-  <button onclick="goHome()" style="background:none;color:#888">Back</button>
-  <div style="text-align:center;margin-top:20px"><div class="logo logo-big" style="margin:0 auto"><svg viewBox="0 0 100 80" fill="none"><path d="M50 12 C30 12 12 20 12 38 C12 56 30 64 50 64 L62 64 C66 72 72 76 80 74 C74 68 74 62 76 56 C90 50 92 28 78 18 C66 8 52 12 42 26 C32 40 22 52 14 46 C8 42 10 30 20 24 C30 18 40 26 50 38 C60 50 70 58 80 52 C88 47 88 36 80 30 C70 22 58 28 50 38" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2 style="font-size:26px;margin:14px 0 4px">Join <span class="aurora-text">4everChats</span></h2><p id="debug" style="font-size:12px;color:#facc15">Connecting...</p></div>
-  <div class="card"><label style="font-size:11px;color:#888;font-weight:700">USERNAME</label><input id="username" placeholder="@Code_E" class="field"><label style="font-size:11px;color:#888;font-weight:700;display:block;margin-top:12px">EMAIL</label><input id="email" placeholder="you@email.com" class="field"><label style="font-size:11px;color:#888;font-weight:700;display:block;margin-top:12px">PASSWORD</label><input id="password" type="password" placeholder="Password" class="field"><button onclick="signup()" class="btn-aurora"><span data-i18n="create">Create Free Account</span></button><button onclick="login()" class="btn-grey"><span data-i18n="loginBtn2">Login</span></button><p id="authMsg" style="color:#f87171;text-align:center;font-size:13px;min-height:18px"></p></div>
+
+<!-- AUTH MODAL -->
+<div id="auth" class="hidden fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <div class="bg-white w-full sm:max-w-sm rounded-t-[28px] sm:rounded-[28px] p-6 pb-8">
+    <div class="flex justify-between items-center"><h2 id="authTitle" class="text-2xl font-black">Start Chatting</h2><button onclick="closeAuth()" class="text-2xl w-8 h-8">✕</button></div>
+    <p id="authSub" class="text-gray-500 text-sm mt-1">Pick a username to continue.</p>
+    <label class="block text-xs font-bold text-gray-500 mt-6">USERNAME</label>
+    <input id="usernameInput" placeholder="e.g. CodeE" class="w-full border-2 border-gray-200 rounded-2xl px-4 py-3.5 mt-1 text-[16px] outline-none focus:border-green-500">
+    <label class="block text-xs font-bold text-gray-500 mt-4">DISPLAY NAME (OPTIONAL)</label>
+    <input id="displayInput" placeholder="e.g. Kingston King" class="w-full border-2 border-gray-200 rounded-2xl px-4 py-3.5 mt-1 text-[16px] outline-none focus:border-green-500">
+    <button onclick="enterApp()" class="w-full bg-black text-white font-bold py-4 rounded-full mt-6 active:scale-[0.98]">Continue →</button>
+    <p class="text-center text-[11px] text-gray-400 mt-3">By continuing you agree to be kind. No spam.</p>
+  </div>
 </div>
-<div id="app" class="hidden">
-  <div style="padding:10px 12px;background:#111;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center"><div><b id="currentChatName">World Chat</b><div id="memberCount" style="font-size:11px;color:#4ade80">Online now</div></div><button onclick="loadMessages()" style="background:#1f1f23;color:#fff;padding:8px 12px;border-radius:999px;font-size:12px">Reload</button></div>
-  <div style="padding:10px"><input id="searchMsg" placeholder="Search messages..." oninput="filterMessages(this.value)" class="field" style="margin:0;border-radius:999px"></div>
-  <div id="debugBox" class="hidden" style="margin:0 12px;padding:10px;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.3);border-radius:12px;font-size:11px;color:#fef08a"></div>
-  <p id="chatError" style="color:#f87171;text-align:center;font-size:12px;font-weight:700;min-height:16px;margin:6px 0"></p>
-  <div id="dmBar" class="hidden" style="padding:0 12px"><div style="display:flex;gap:8px"><input id="searchUser" placeholder="Search @username" class="field" style="margin:0"><button onclick="searchUser()" style="background:linear-gradient(135deg,#A3E635,#22D3EE);border:0;padding:0 16px;border-radius:12px;font-weight:900">Search</button></div></div>
-  <div id="groupBar" class="hidden" style="padding:0 12px"><div style="display:flex;gap:8px"><input id="groupName" placeholder="New group name..." class="field" style="margin:0"><button onclick="createGroup()" style="background:linear-gradient(135deg,#A3E635,#22D3EE);border:0;padding:0 16px;border-radius:12px;font-weight:900">Create</button></div><div id="groupList" style="display:flex;gap:8px;overflow-x:auto;margin-top:8px"></div></div>
-  <div id="userResults" style="padding:0 12px"></div>
-  <div id="replyBar" class="hidden" style="margin:8px 12px;padding:10px;background:rgba(163,230,53,.15);border-left:4px solid #A3E635;border-radius:0 12px 12px 0;font-size:12px;display:flex;justify-content:space-between"><span id="replyText"></span><button onclick="cancelReply()" style="background:none;color:#fff">X</button></div>
-  <div id="messages"></div>
-  <div id="inputBar"><input id="msgInput" placeholder="Type a message..." class="field" style="margin:0;border-radius:999px;flex:1"><button id="sendBtn" onclick="sendMsg()" style="background:linear-gradient(135deg,#A3E635,#22D3EE,#8B5CF6);border:0;padding:0 20px;border-radius:999px;font-weight:900;color:#000">Send</button></div>
-  <div id="bottomNav"><button onclick="showTab('world')" id="nav-world" class="nav active">World<br>World</button><button onclick="showTab('groups')" id="nav-groups" class="nav">Groups<br>Groups</button><button onclick="showTab('dms')" id="nav-dms" class="nav">DMs<br>DMs</button></div>
+
+<!-- APP -->
+<div id="app" class="hidden chat-bg min-h-[100dvh] flex flex-col">
+  <div class="bg-[#075e54] sm:bg-[#008069] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+    <div><div class="font-bold text-[19px] leading-none">4everChats</div><div id="myNameLabel" class="text-[12px] opacity-80 mt-0.5">@you • Online</div></div>
+    <button onclick="logout()" class="bg-white/20 px-3 py-1.5 rounded-full text-xs font-bold">Log out</button>
+  </div>
+  <div class="flex flex-1 overflow-hidden">
+    <!-- CONTACTS -->
+    <div id="contactsPane" class="w-full sm:w-[340px] bg-white border-r flex flex-col">
+      <div class="p-3"><input oninput="filterContacts(this.value)" placeholder="Search or start new chat" class="w-full bg-[#f0f2f5] rounded-full px-4 py-2.5 text-sm outline-none"></div>
+      <div id="contactsList" class="flex-1 overflow-y-auto"></div>
+      <div class="p-3 border-t"><button onclick="newChat()" class="w-full bg-black text-white font-bold py-3 rounded-full text-sm">+ New Chat</button></div>
+    </div>
+    <!-- CHAT -->
+    <div id="chatPane" class="hidden sm:flex flex-1 flex-col bg-[#efeae2]">
+      <div class="bg-white px-4 py-3 flex items-center gap-3 shadow-sm">
+        <button onclick="showContacts()" class="sm:hidden text-xl">←</button>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-lg" id="chatAvatar">J</div>
+        <div class="flex-1"><div id="chatName" class="font-bold">Select a chat</div><div class="text-xs text-green-600">Online • replies instantly</div></div>
+        <button onclick="clearChat()" class="text-xs bg-gray-100 px-3 py-1.5 rounded-full font-bold">Clear</button>
+      </div>
+      <div id="messages" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2"></div>
+      <div class="bg-white p-2 flex gap-2 items-center">
+        <input id="msgInput" placeholder="Message" class="flex-1 bg-[#f0f2f5] rounded-full px-4 py-3 outline-none text-[15px]" onkeydown="if(event.key==='Enter') sendMsg()">
+        <button onclick="sendMsg()" class="w-11 h-11 rounded-full bg-[#00a884] text-white text-xl flex items-center justify-center shrink-0">➤</button>
+      </div>
+    </div>
+  </div>
 </div>
+
 <script>
-function showToast(t){let el=document.getElementById('toast'); el.innerText=t; el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'),3000)}
-function showDebug(t){let b=document.getElementById('debugBox'); b.classList.remove('hidden'); b.innerText=t}
-function setChatErr(t){document.getElementById('chatError').innerText=t}
-const LANGS={en:{title1:"Chat",title2:"Forever.",title3:"With Anyone.",title4:"Anywhere.",subtitle:"Built in Jamaica - for the whole world.",start:"Start Chatting",loginBtn:"Login",create:"Create Free Account",loginBtn2:"Login"},es:{title1:"Chatea",title2:"Para Siempre.",title3:"Con Cualquiera.",title4:"En Cualquier Lugar.",subtitle:"Hecho en Jamaica - para todo el mundo.",start:"Empezar",loginBtn:"Iniciar Sesion",create:"Crear Cuenta Gratis",loginBtn2:"Iniciar Sesion"},fr:{title1:"Discutez",title2:"Pour Toujours.",title3:"Avec Tout Le Monde.",title4:"Partout.",subtitle:"Fait en Jamaique - pour le monde entier.",start:"Commencer",loginBtn:"Connexion",create:"Creer Un Compte",loginBtn2:"Connexion"},pt:{title1:"Converse",title2:"Para Sempre.",title3:"Com Qualquer Um.",title4:"Em Qualquer Lugar.",subtitle:"Feito na Jamaica - para o mundo todo.",start:"Comecar",loginBtn:"Entrar",create:"Criar Conta Gratis",loginBtn2:"Entrar"},ht:{title1:"Chat",title2:"Pou Toutan.",title3:"Ak Nenpot Moun.",title4:"Nenpot Kote.",subtitle:"Fet nan Jamaica - pou tout mond lan.",start:"Komanse Chat",loginBtn:"Konekte",create:"Kreye Kont Gratis",loginBtn2:"Konekte"},de:{title1:"Chatte",title2:"Fur Immer.",title3:"Mit Jedem.",title4:"Uberall.",subtitle:"Gemacht in Jamaika - fur die ganze Welt.",start:"Jetzt Chatten",loginBtn:"Anmelden",create:"Kostenloses Konto",loginBtn2:"Anmelden"},ja:{title1:"Chat",title2:"Forever.",title3:"With Anyone.",title4:"Anywhere.",subtitle:"Made in Jamaica - for the world.",start:"Start Chatting",loginBtn:"Login",create:"Create Free Account",loginBtn2:"Login"},hi:{title1:"Chat",title2:"Forever.",title3:"With Anyone.",title4:"Anywhere.",subtitle:"Made in Jamaica - for the world.",start:"Start Chatting",loginBtn:"Login",create:"Create Free Account",loginBtn2:"Login"},ar:{title1:"Chat",title2:"Forever.",title3:"With Anyone.",title4:"Anywhere.",subtitle:"Made in Jamaica - for the world.",start:"Start Chatting",loginBtn:"Login",create:"Create Free Account",loginBtn2:"Login"}};
-function setLang(l){let d=LANGS[l]||LANGS.en; document.querySelectorAll('[data-i18n]').forEach(el=>{let k=el.getAttribute('data-i18n'); if(d[k]) el.innerText=d[k]}); localStorage.setItem('lang',l)}
-setLang(localStorage.getItem('lang')||'en');
-function goHome(){document.getElementById('pageHome').classList.remove('hidden'); document.getElementById('pageAuth').classList.add('hidden'); document.getElementById('app').classList.add('hidden'); document.getElementById('topbar').classList.add('hidden')}
-function goAuth(){document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageAuth').classList.remove('hidden')}
-function showApp(){document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageAuth').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); document.getElementById('topbar').classList.remove('hidden'); loadProfile()}
-const SUPABASE_URL="https://wynhiatmhdvmelibxrgs.supabase.co"; const SUPABASE_KEY="sb_publishable_6U9KBH2lcaEUNJz6WmWpQQ_qQdbI_qe";
-let supabaseClient=null, me=null, currentChat="00000000-0000-0000-0000-000000000001", replyTo=null, allMsgs=[], profilesMap={}, sending=false, reactions={};
-function tryInit(){if(window.supabase){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); document.getElementById('debug').innerText="Ready"; init()} else {let s=document.createElement('script'); s.src="https://unpkg.com/@supabase/supabase-js@2"; s.onload=()=>{supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); document.getElementById('debug').innerText="Ready"; init()}; document.head.appendChild(s)}} tryInit();
-function setMsg(t,c){let el=document.getElementById('authMsg'); el.innerText=t; el.style.color=c||'#f87171'}
-function timeAgo(d){return new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
-async function init(){if(!supabaseClient) return; let {data:{session}}=await supabaseClient.auth.getSession(); if(session){me=session.user; showApp(); await ensureWorldChat(); await loadMessages(); subscribe()} }
-async function ensureWorldChat(){try{let {data}=await supabaseClient.from('conversations').select('id').eq('id',currentChat).single(); if(!data){let {error:e2}=await supabaseClient.from('conversations').insert({id:currentChat,type:'group',name:'World Chat'}); if(e2) showDebug("World chat missing: "+e2.message)}}catch(e){}}
-async function signup(){let email=document.getElementById('email').value.trim(), pass=document.getElementById('password').value, user=document.getElementById('username').value.trim().replace('@',''); if(!user||!email||!pass) return setMsg("Fill all fields"); setMsg("Creating...","#a3e635"); let {data,error}=await supabaseClient.auth.signUp({email,password:pass}); if(error) return setMsg(error.message); if(data.user){let {error:pe}=await supabaseClient.from('profiles').insert({id:data.user.id,username:user}); if(pe) setMsg("Profile failed: "+pe.message); await supabaseClient.from('conversation_members').insert({conversation_id:currentChat,user_id:data.user.id}); localStorage.setItem('myUsername',user)} return login()}
-async function login(){let email=document.getElementById('email').value.trim(), pass=document.getElementById('password').value; if(!email||!pass) return setMsg("Enter email + password"); setMsg("Logging in...","#a3e635"); let {data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass}); if(error) return setMsg(error.message); me=data.user; showApp(); await ensureWorldChat(); await loadMessages(); subscribe()}
-async function logout(){await supabaseClient.auth.signOut(); location.reload()}
-async function loadProfile(){let {data}=await supabaseClient.from('profiles').select('*').eq('id',me.id).single(); if(!data){let guess=localStorage.getItem('myUsername')||me.email.split('@')[0]; let {error:e2}=await supabaseClient.from('profiles').insert({id:me.id,username:guess}); if(e2) showDebug("Profile missing: "+e2.message); else data={username:guess}} document.getElementById('onlineText').innerText="Hi, "+(data?.username||"User")+" - Online"; try{await supabaseClient.from('conversation_members').insert({conversation_id:currentChat,user_id:me.id})}catch(e){} }
-function showTab(t){document.getElementById('dmBar').classList.add('hidden'); document.getElementById('groupBar').classList.add('hidden'); if(t==='world'){currentChat="00000000-0000-0000-0000-000000000001"; document.getElementById('currentChatName').innerText="World Chat";} if(t==='dms'){document.getElementById('dmBar').classList.remove('hidden')} if(t==='groups'){document.getElementById('groupBar').classList.remove('hidden'); loadGroups()} document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active')); document.querySelectorAll('.pill').forEach(n=>n.classList.remove('active')); if(t==='world') document.getElementById('nav-world').classList.add('active'); if(t==='groups') document.getElementById('nav-groups').classList.add('active'); if(t==='dms') document.getElementById('nav-dms').classList.add('active'); loadMessages()}
-async function createGroup(){let name=document.getElementById('groupName').value.trim(); if(!name) return showToast("Type a group name"); let {data:conv,[STRIPPED] supabaseClient.from('conversations').insert({type:'group',name:name}).select().single(); if(error) return setChatErr("Group error: "+error.message); await supabaseClient.from('conversation_members').insert({conversation_id:conv.id,user_id:me.id}); document.getElementById('groupName').value=""; showToast("Group created!"); loadGroups(); openGroup(conv.id,name)}
-async function loadGroups(){let {data:myConvs}=await supabaseClient.from('conversation_members').select('conversation_id').eq('user_id',me.id); let ids=(myConvs||[]).map(c=>c.conversation_id); let {data:groups}=await supabaseClient.from('conversations').select('*').in('id',ids).eq('type','group'); let list=document.getElementById('groupList'); list.innerHTML=""; if(!groups||!groups.length) list.innerHTML="<p style='font-size:12px;color:#888'>No groups yet</p>"; (groups||[]).forEach(g=>{let b=document.createElement('button'); b.className="pill"; b.innerText=g.name; b.onclick=()=>openGroup(g.id,g.name); list.appendChild(b)})}
-function openGroup(id,name){currentChat=id; document.getElementById('currentChatName').innerText=name; loadMessages()}
-async function searchUser(){let q=document.getElementById('searchUser').value.trim(); if(!q) return showToast("Type a username"); let {data,error}=await supabaseClient.from('profiles').select('*').ilike('username',`%${q}%`).neq('id',me.id).limit(5); if(error) return setChatErr(error.message); let html=""; if(!data||!data.length) html="<p style='font-size:12px;color:#888'>No user found</p>"; (data||[]).forEach(u=>html+=`<div style="background:#1f1f23;padding:12px;border-radius:14px;display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>@${u.username}</span><button onclick="startDM('${u.id}','${u.username}')" style="background:linear-gradient(135deg,#A3E635,#22D3EE);border:0;padding:8px 14px;border-radius:999px;font-weight:900">Message</button></div>`); document.getElementById('userResults').innerHTML=html}
-async function startDM(otherId,otherName){let {data:myConvs}=await supabaseClient.from('conversation_members').select('conversation_id').eq('user_id',me.id); let found=null; for(let c of (myConvs||[])){let {data:m}=await supabaseClient.from('conversation_members').select('user_id').eq('conversation_id',c.conversation_id); if(m.length===2 && m.some(x=>x.user_id===otherId)) found=c.conversation_id} if(!found){let {data:conv,[STRIPPED] supabaseClient.from('conversations').insert({type:'dm',name:otherName}).select().single(); if(error) return setChatErr(error.message); found=conv.id; await supabaseClient.from('conversation_members').insert([{conversation_id:found,user_id:me.id},{conversation_id:found,user_id:otherId}])} currentChat=found; document.getElementById('currentChatName').innerText="@"+otherName; loadMessages()}
-function doReply(text){replyTo=text; document.getElementById('replyBar').classList.remove('hidden'); document.getElementById('replyText').innerText=text.slice(0,60)}
-function cancelReply(){replyTo=null; document.getElementById('replyBar').classList.add('hidden')}
-function doReact(id,emoji){reactions[id]=reactions[id]||{}; reactions[id][emoji]=(reactions[id][emoji]||0)+1; renderMessages(allMsgs)}
-function filterMessages(q){if(!q) return renderMessages(allMsgs); let f=allMsgs.filter(m=>(m.content||'').toLowerCase().includes(q.toLowerCase())); renderMessages(f)}
-function renderMessages(data){let box=document.getElementById('messages'); box.innerHTML=""; if(!data||!data.length){box.innerHTML=`<div style="text-align:center;margin-top:60px"><div class="logo" style="margin:0 auto"><svg viewBox="0 0 100 80" fill="none"><path d="M50 12 C30 12 12 20 12 38 C12 56 30 64 50 64 L62 64 C66 72 72 76 80 74 C74 68 74 62 76 56 C90 50 92 28 78 18 C66 8 52 12 42 26 C32 40 22 52 14 46 C8 42 10 30 20 24 C30 18 40 26 50 38 C60 50 70 58 80 52 C88 47 88 36 80 30 C70 22 58 28 50 38" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><p><b>No messages yet</b></p><p style="color:#888;font-size:13px">Be the first to say hi!</p></div>`; return} data.forEach(m=>{let isMe=m.sender_id===me.id, name=profilesMap[m.sender_id]||'User'; box.innerHTML+=`<div style="display:flex;${isMe?'justify-content:flex-end':'justify-content:flex-start'}"><div class="${isMe?'bubble-me':'bubble-other'}"><div style="font-size:11px;font-weight:700;opacity:.7">@${name} - ${timeAgo(m.created_at)}</div><div style="font-size:15px;margin-top:2px;word-break:break-word">${(m.content||'').replace(/</g,'&lt;')}</div><div style="font-size:11px;margin-top:6px;display:flex;gap:10px"><button onclick="doReact('${m.id}','❤️')" style="background:none;border:0;color:inherit">Heart</button><button onclick="doReply('${(m.content||'').replace(/'/g,'')}')" style="background:none;border:0;color:inherit;font-weight:700">Reply</button><span>${isMe?'✓✓':''}</span></div></div></div>`}); box.scrollTop=box.scrollHeight}
-async function loadMessages(){let {data,error}=await supabaseClient.from('messages').select('*').eq('conversation_id',currentChat).order('created_at',{ascending:true}).limit(100); if(error){setChatErr("Load error: "+error.message); return} allMsgs=data||[]; let ids=[...new Set(allMsgs.map(m=>m.sender_id))]; if(ids.length){let {data:p}=await supabaseClient.from('profiles').select('id,username').in('id',ids); (p||[]).forEach(x=>profilesMap[x.id]=x.username)} document.getElementById('memberCount').innerText=allMsgs.length+" messages - Online now"; renderMessages(allMsgs)}
-async function sendMsg(){if(sending) return; let input=document.getElementById('msgInput'); let text=input.value.trim(); if(!text) return; if(!me){setChatErr("Not logged in - logout and login again"); return} sending=true; document.getElementById('sendBtn').innerText="..."; let finalText=replyTo ? "Reply: "+replyTo.slice(0,40)+" | "+text : text; cancelReply(); input.value=""; let temp={id:'temp-'+Date.now(),sender_id:me.id,content:finalText,created_at:new Date().toISOString()}; allMsgs.push(temp); renderMessages(allMsgs); let {error}=await supabaseClient.from('messages').insert({conversation_id:currentChat,sender_id:me.id,content:finalText}); sending=false; document.getElementById('sendBtn').innerText="Send"; if(error){allMsgs=allMsgs.filter(m=>m.id!==temp.id); renderMessages(allMsgs); input.value=text; setChatErr("SEND FAILED: "+error.message); showDebug("SEND FAILED: "+error.message+" - Supabase > messages > Policies > Allow ALL"); return} setChatErr(""); setTimeout(()=>loadMessages(),500)}
-function subscribe(){supabaseClient.channel('chat17').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{if(payload.new.conversation_id===currentChat) loadMessages()}).subscribe()}
-document.getElementById('msgInput')?.addEventListener('keydown',e=>{if(e.key==='Enter') sendMsg()});
+let me = localStorage.getItem('4ever_user') || '';
+let current = 'Jamaica Group';
+let chats = JSON.parse(localStorage.getItem('4ever_chats') || '{}');
+let contacts = [
+  {name:'Jamaica Group', last:'Welcome to 4everChats! 🇯🇲', avatar:'J', color:'from-green-400 to-blue-500'},
+  {name:'Kingston Vibes', last:'Wah gwaan? 🔥', avatar:'K', color:'from-yellow-400 to-orange-500'},
+  {name:'World Chat', last:'Hello from around the world 🌍', avatar:'W', color:'from-purple-400 to-pink-500'},
+  {name:'4ever Support', last:'We are here to help you', avatar:'4', color:'from-blue-400 to-cyan-500'}
+];
+function openAuth(mode){
+  document.getElementById('auth').classList.remove('hidden');
+  document.getElementById('authTitle').textContent = mode==='login' ? 'Welcome Back' : 'Start Chatting';
+  document.getElementById('authSub').textContent = mode==='login' ? 'Login with your username.' : 'Pick a username to continue.';
+  setTimeout(()=>document.getElementById('usernameInput').focus(),100);
+}
+function closeAuth(){ document.getElementById('auth').classList.add('hidden'); }
+function enterApp(){
+  let u = document.getElementById('usernameInput').value.trim();
+  let d = document.getElementById('displayInput').value.trim();
+  if(!u){ alert('Please enter a username'); return; }
+  me = u; localStorage.setItem('4ever_user', u);
+  if(d) localStorage.setItem('4ever_display', d);
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('auth').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('myNameLabel').textContent = '@'+u+' • Online';
+  renderContacts(); openChat(current);
+}
+function logout(){ localStorage.removeItem('4ever_user'); location.reload(); }
+function renderContacts(filter=''){
+  let list = document.getElementById('contactsList');
+  list.innerHTML = contacts.filter(c=>c.name.toLowerCase().includes(filter.toLowerCase())).map(c=>{
+    let msgs = chats[c.name]||[];
+    let last = msgs.length ? msgs[msgs.length-1].text : c.last;
+    return `<div onclick="openChat('${c.name}')" class="flex items-center gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer active:bg-gray-50">
+      <div class="w-12 h-12 rounded-full bg-gradient-to-br ${c.color} flex items-center justify-center text-white font-bold text-lg shrink-0">${c.avatar}</div>
+      <div class="flex-1 min-w-0"><div class="font-semibold truncate">${c.name}</div><div class="text-[13px] text-gray-500 truncate">${last}</div></div>
+      <div class="text-[11px] text-gray-400">now</div></div>`;
+  }).join('');
+}
+function filterContacts(v){ renderContacts(v); }
+function openChat(name){
+  current = name;
+  let c = contacts.find(x=>x.name===name) || contacts[0];
+  document.getElementById('chatName').textContent = name;
+  document.getElementById('chatAvatar').textContent = c.avatar;
+  if(window.innerWidth < 640){ document.getElementById('contactsPane').classList.add('hidden'); document.getElementById('chatPane').classList.remove('hidden'); document.getElementById('chatPane').classList.add('flex'); }
+  renderMessages();
+}
+function showContacts(){ document.getElementById('contactsPane').classList.remove('hidden'); document.getElementById('chatPane').classList.add('hidden'); document.getElementById('chatPane').classList.remove('flex'); }
+function renderMessages(){
+  let box = document.getElementById('messages');
+  let msgs = chats[current] || [];
+  if(msgs.length===0){
+    msgs = [{from:'them', text:'Welcome to '+current+'! 🎉 This is your 4everChats. Send a message to get started.'}];
+    chats[current]=msgs; saveChats();
+  }
+  box.innerHTML = msgs.map(m=>`<div class="msg ${m.from==='me'?'me':'them'}">${escapeHtml(m.text)}<div class="text-[10px] opacity-60 text-right mt-1">${m.time||'now'}</div></div>`).join('');
+  box.scrollTop = box.scrollHeight;
+  renderContacts();
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sendMsg(){
+  let inp = document.getElementById('msgInput');
+  let t = inp.value.trim(); if(!t) return;
+  if(!chats[current]) chats[current]=[];
+  chats[current].push({from:'me', text:t, time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+  saveChats(); inp.value=''; renderMessages();
+  setTimeout(()=>{
+    let replies = ['Nice! 🔥','Wah gwaan! Welcome to 4everChats 🇯🇲','Fr fr 😂','Say it again for the people in the back!','Love that for you 💚','Real talk!'];
+    chats[current].push({from:'them', text:replies[Math.floor(Math.random()*replies.length)], time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+    saveChats(); renderMessages();
+  }, 800);
+}
+function saveChats(){ localStorage.setItem('4ever_chats', JSON.stringify(chats)); }
+function clearChat(){ if(confirm('Clear this chat?')){ chats[current]=[]; saveChats(); renderMessages(); } }
+function newChat(){
+  let n = prompt('Enter name for new chat:'); if(!n) return;
+  contacts.unshift({name:n, last:'New chat started', avatar:n[0].toUpperCase(), color:'from-green-400 to-blue-500'});
+  renderContacts(); openChat(n);
+}
+// Auto-login if already logged in
+if(me){ document.getElementById('landing').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); document.getElementById('myNameLabel').textContent='@'+me+' • Online'; renderContacts(); openChat(current); }
 </script>
 </body>
 </html>
