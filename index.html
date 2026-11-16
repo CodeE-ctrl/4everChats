@@ -3,33 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>4everChats ∞ - Media + DMs</title>
+<title>4everChats - Real Social</title>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#fff}
 .aurora{background:linear-gradient(135deg,#a3e635,#4ade80 25%,#2dd4bf 50%,#38bdf8 75%,#a78bfa);min-height:100dvh}
 .hidden{display:none!important}
 .msg{max-width:78%;padding:8px 12px;border-radius:18px;font-size:15px;line-height:1.4;word-wrap:break-word}
 .me{background:#00a884;color:#fff;border-bottom-right-radius:4px;margin-left:auto}
 .them{background:#fff;border-bottom-left-radius:4px;box-shadow:0 1px 1px rgba(0,0,0,.08)}
 .tab-active{background:#000!important;color:#fff!important}
-.logo-img{width:48px;height:48px;border-radius:14px;object-fit:cover}
-#splash{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .5s}
-#splash.hide{opacity:0;pointer-events:none}
+.logo-box{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#a3e635,#22d3ee,#38bdf8,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-size:32px;font-weight:900;line-height:1;box-shadow:0 4px 20px rgba(0,0,0,.25);position:relative;overflow:hidden}
+.logo-box::after{content:"";position:absolute;inset:0;border:3px solid #fff;border-radius:50% 50% 50% 0;transform:scale(.7) rotate(-10deg);opacity:.9}
 .post-img{width:100%;border-radius:16px;margin-top:10px;max-height:420px;object-fit:cover}
 </style>
 </head>
 <body>
-<div id="splash"><img src="logo.png" style="width:180px;height:180px;border-radius:40px;object-fit:cover;box-shadow:0 0 80px rgba(74,222,128,.6)" onerror="this.style.display='none'"></div>
+
+<!-- NO SPLASH - OPENS STRAIGHT TO APP -->
 
 <div id="landing" class="aurora flex flex-col p-5 pb-8">
-  <div class="flex justify-between items-center"><img src="logo.png" class="logo-img" onerror="this.style.display='none'"><span class="bg-black/10 rounded-full px-3 py-2 text-sm font-bold">English</span></div>
+  <div class="flex justify-between items-center"><div class="logo-box">∞</div><span class="bg-black/10 rounded-full px-3 py-2 text-sm font-bold">English</span></div>
   <h1 class="text-[52px] leading-[0.95] font-black mt-8">Chat<br>Forever.<br><span class="text-white">With Anyone.</span><br>Anywhere.</h1>
   <p class="font-semibold mt-3">Photos • Videos • DMs • Groups • Built in Jamaica 🇯🇲</p>
   <div class="mt-auto flex flex-col gap-3 pt-10">
     <button onclick="openAuth()" class="w-full bg-black text-white font-bold py-4 rounded-full text-[17px]">Start Chatting</button>
     <button onclick="openAuth()" class="w-full bg-white/60 font-bold py-4 rounded-full text-[15px] text-blue-600">Login</button>
+    <p class="text-center text-xs opacity-70">If you see this green page, the black screen is FIXED ✅</p>
   </div>
 </div>
 
@@ -44,7 +45,7 @@
 
 <div id="app" class="hidden bg-[#f0f2f5] min-h-[100dvh] flex flex-col pb-20">
   <div class="bg-[#075e54] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-    <div class="flex items-center gap-2"><img src="logo.png" style="width:36px;height:36px;border-radius:10px;object-fit:cover"><div><div class="font-bold text-[19px] leading-none">4everChats ∞</div><div id="myNameLabel" class="text-[12px] opacity-80">@you • Online</div></div></div>
+    <div class="flex items-center gap-2"><div class="logo-box" style="width:36px;height:36px;border-radius:10px;font-size:22px">∞</div><div><div class="font-bold text-[19px] leading-none">4everChats ∞</div><div id="myNameLabel" class="text-[12px] opacity-80">@you • Online</div></div></div>
     <button onclick="logout()" class="bg-white/20 px-3 py-1.5 rounded-full text-xs font-bold">Log out</button>
   </div>
 
@@ -55,7 +56,6 @@
     <button id="tabProfile" onclick="showTab('profile')" class="flex-1 py-2.5 rounded-full font-bold text-sm bg-gray-100">👤 Me</button>
   </div>
 
-  <!-- FEED WITH MEDIA -->
   <div id="feedPane" class="flex flex-col gap-3 p-3">
     <div class="bg-white rounded-2xl p-3 shadow-sm">
       <textarea id="postInput" placeholder="What's happening? Share a photo/video 🇯🇲" class="w-full outline-none resize-none text-[15px] min-h-[60px]"></textarea>
@@ -69,7 +69,6 @@
     <div id="postsList" class="flex flex-col gap-3"><div class="text-center text-gray-500 text-sm">Loading posts...</div></div>
   </div>
 
-  <!-- GROUP CHATS -->
   <div id="chatsPane" class="hidden flex-col">
     <div id="contactsList" class="flex flex-col bg-white"></div>
     <div id="chatPane" class="hidden flex-col bg-[#efeae2] min-h-[60vh]">
@@ -79,7 +78,6 @@
     </div>
   </div>
 
-  <!-- DIRECT MESSAGES -->
   <div id="dmsPane" class="hidden flex-col gap-3 p-3">
     <div class="bg-white rounded-2xl p-3 shadow-sm">
       <p class="font-bold text-sm">Start a private DM</p>
@@ -98,19 +96,16 @@
     </div>
   </div>
 
-  <!-- PROFILE -->
   <div id="profilePane" class="hidden p-4">
     <div class="bg-white rounded-3xl p-6 text-center shadow-sm">
-      <img src="logo.png" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin:0 auto">
+      <div class="logo-box" style="width:80px;height:80px;border-radius:20px;font-size:50px;margin:0 auto">∞</div>
       <h2 id="profileName" class="text-2xl font-black mt-3">@CodeE</h2>
       <p class="text-gray-500 text-sm">Member of 4everChats ∞ • Jamaica 🇯🇲</p>
-      <div class="flex gap-3 mt-4"><div class="flex-1 bg-gray-100 rounded-2xl py-3"><div id="myPostsCount" class="font-black text-lg">0</div><div class="text-xs text-gray-500">Posts</div></div><div class="flex-1 bg-gray-100 rounded-2xl py-3"><div class="font-black text-lg">∞</div><div class="text-xs text-gray-500">Forever</div></div></div>
     </div>
   </div>
 </div>
 
 <script>
-setTimeout(()=>{document.getElementById('splash').classList.add('hide'); setTimeout(()=>document.getElementById('splash').style.display='none',600)},1500);
 const SUPABASE_URL = "https://wotvfxqlcmfvjfpvwrik.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_CVKqhCdG90vTEV6O2kKN6g_lEoCSJe3";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -120,7 +115,6 @@ let currentDM = null;
 let contacts = [{name:'Jamaica Group',avatar:'J'},{name:'Kingston Vibes',avatar:'K'},{name:'World Chat',avatar:'W'},{name:'4ever Support',avatar:'4'}];
 let channel=null, postChannel=null, dmChannel=null;
 let pendingPostFile=null;
-
 function openAuth(){document.getElementById('auth').classList.remove('hidden')}
 function closeAuth(){document.getElementById('auth').classList.add('hidden')}
 function enterApp(){
@@ -148,7 +142,6 @@ async function uploadMedia(file){
   let {data} = supabase.storage.from('media').getPublicUrl(name);
   return data.publicUrl;
 }
-// --- FEED ---
 function previewPostFile(input){
   if(!input.files[0]) return; pendingPostFile=input.files[0];
   let url=URL.createObjectURL(pendingPostFile);
@@ -158,7 +151,6 @@ async function sendPost(){
   let text=document.getElementById('postInput').value.trim();
   if(!text && !pendingPostFile) return alert('Write something or add a photo');
   document.getElementById('uploadStatus').classList.remove('hidden'); document.getElementById('uploadStatus').textContent='Uploading...';
-  document.getElementById('postBtn').textContent='Posting...';
   try{
     let image_url=null, media_type='text';
     if(pendingPostFile){ image_url=await uploadMedia(pendingPostFile); media_type=pendingPostFile.type.startsWith('video')?'video':'image'; }
@@ -167,28 +159,26 @@ async function sendPost(){
     document.getElementById('postInput').value=''; document.getElementById('postPreview').classList.add('hidden'); pendingPostFile=null; document.getElementById('postFile').value='';
     loadPosts();
   }catch(e){ alert('Post failed: '+e.message+'\nDid you create the media bucket?') }
-  document.getElementById('uploadStatus').classList.add('hidden'); document.getElementById('postBtn').textContent='Post →';
+  document.getElementById('uploadStatus').classList.add('hidden');
 }
 async function loadPosts(){
   let {data}=await supabase.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
   let list=document.getElementById('postsList'); list.innerHTML='';
   if(!data||!data.length) list.innerHTML='<div class="bg-white rounded-2xl p-4 text-center text-gray-500 text-sm">No posts yet. Be the first to post a photo! 🚀</div>';
   else data.forEach(addPostToUI);
-  if(data) document.getElementById('myPostsCount').textContent=data.filter(p=>p.username===me).length;
 }
 function addPostToUI(p){
   let list=document.getElementById('postsList'); if(list.textContent.includes('No posts yet')) list.innerHTML='';
   let div=document.createElement('div'); div.className='bg-white rounded-2xl p-4 shadow-sm';
   let media='';
   if(p.image_url){ if(p.media_type==='video') media=`<video src="${p.image_url}" controls class="post-img"></video>`; else media=`<img src="${p.image_url}" class="post-img">`; }
-  div.innerHTML=`<div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-purple-500 flex items-center justify-center text-white font-bold">${escapeHtml((p.username||'?')[0].toUpperCase())}</div><div><div class="font-bold text-sm">@${escapeHtml(p.username)} <button onclick="quickDM('${escapeHtml(p.username)}')" class="text-blue-600 text-xs font-bold ml-1">• Message</button></div><div class="text-xs text-gray-400">${new Date(p.created_at).toLocaleString()}</div></div></div><div class="mt-2 text-[15px]">${escapeHtml(p.text||'')}</div>${media}<div class="flex gap-4 mt-3 text-sm text-gray-500"><span>❤️ Like</span><span>💬 Comment</span><span>↗️ Share</span></div>`;
+  div.innerHTML=`<div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-purple-500 flex items-center justify-center text-white font-bold">${escapeHtml((p.username||'?')[0].toUpperCase())}</div><div><div class="font-bold text-sm">@${escapeHtml(p.username)} <button onclick="quickDM('${escapeHtml(p.username)}')" class="text-blue-600 text-xs font-bold ml-1">• Message</button></div><div class="text-xs text-gray-400">${new Date(p.created_at).toLocaleString()}</div></div></div><div class="mt-2 text-[15px]">${escapeHtml(p.text||'')}</div>${media}`;
   list.prepend(div);
 }
 function subscribePosts(){
   if(postChannel) supabase.removeChannel(postChannel);
   postChannel=supabase.channel('posts-feed').on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},p=>addPostToUI(p.new)).subscribe();
 }
-// --- GROUP CHAT ---
 function renderContacts(){document.getElementById('contactsList').innerHTML = contacts.map(c=>`<div onclick="openChat('${c.name}')" class="flex items-center gap-3 px-4 py-3 border-b border-gray-50 cursor-pointer"><div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-white font-bold text-lg">${c.avatar}</div><div class="flex-1"><div class="font-semibold">${c.name}</div><div class="text-[13px] text-gray-500">Tap to open group chat</div></div><div class="w-2 h-2 bg-green-500 rounded-full"></div></div>`).join('')}
 async function openChat(name){
   current=name; document.getElementById('chatName').textContent=name; document.getElementById('chatAvatar').textContent=name[0];
@@ -215,7 +205,6 @@ async function sendMsg(){
   let inp=document.getElementById('msgInput'); let t=inp.value.trim(); if(!t) return; inp.value='';
   let {error}=await supabase.from('messages').insert({username:me,room:current,text:t}); if(error) alert(error.message);
 }
-// --- DMs ---
 function quickDM(user){ if(user===me) return alert("That's you!"); document.getElementById('dmUserInput').value=user; startDM(); }
 function startDM(){
   let other=document.getElementById('dmUserInput').value.trim(); if(!other) return alert('Enter a username');
@@ -229,7 +218,6 @@ function startDM(){
   dmChannel=supabase.channel('dm-'+me+'-'+other).on('postgres_changes',{event:'INSERT',schema:'public',table:'direct_messages'},p=>{
     let m=p.new; if((m.sender===me&&m.receiver===other)||(m.sender===other&&m.receiver===me)) addDMToUI(m);
   }).subscribe();
-  // Save to DM list
   let dms=JSON.parse(localStorage.getItem('4ever_dms')||'[]'); if(!dms.includes(other)){dms.unshift(other); localStorage.setItem('4ever_dms',JSON.stringify(dms))} loadDMList();
 }
 function closeDMChat(){document.getElementById('dmChatPane').classList.add('hidden'); currentDM=null}
